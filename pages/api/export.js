@@ -1,42 +1,40 @@
-import clientPromise from '/lib/mongodb'
+import clientPromise from '/lib/api/mongodb'
+import apiHandler from '/lib/api/apiHandler'
 
 const DATABASE = 'dint_2'
 
-export default async function handler(req, res) {
-  try {
-    const book_id = req.query.book
+export default apiHandler({
+  get: export_book
+})
 
-    const client = await clientPromise
-    const db = client.db(DATABASE)
-    const book = await db
-      .collection('books')
-      .findOne({ _id: book_id })
+async function export_book(req, res) {
+  const book_id = req.query.book
 
-    let response = {}
-    if (book.book_type = 'daily_log') {
-      const lenses_name = `lenses.${book_id}`
-      const docs_name = `docs.${book_id}`
-      const lenses = book.lenses
-      delete book.lenses
+  const client = await clientPromise
+  const db = client.db(DATABASE)
+  const book = await db
+    .collection('books')
+    .findOne({ _id: book_id })
 
-      const docs = await db
-        .collection(docs_name)
-        .find({})
-        .sort({ date: -1 })
-        .toArray()
+  let response = {}
+  if (book.book_type = 'daily_log') {
+    const lenses_name = `lenses.${book_id}`
+    const docs_name = `docs.${book_id}`
+    const lenses = book.lenses
+    delete book.lenses
 
-      response = {
-        metadata: book,
-        [lenses_name]: lenses,
-        [docs_name]: docs
-      }
+    const docs = await db
+      .collection(docs_name)
+      .find({})
+      .sort({ date: -1 })
+      .toArray()
 
-      res.status(200).json(response)
+    response = {
+      metadata: book,
+      [lenses_name]: lenses,
+      [docs_name]: docs
     }
-  } catch (error) {
-    res.status(500).json(error)
-  }
-  
 
-  
+    res.status(200).json(response)
+  }
 }
