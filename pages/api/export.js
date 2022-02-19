@@ -1,5 +1,6 @@
 import clientPromise from '/lib/api/mongodb'
 import apiHandler from '/lib/api/apiHandler'
+import { ObjectId } from 'mongodb'
 
 const DATABASE = 'dint_2'
 
@@ -14,8 +15,12 @@ async function export_book(req, res) {
   const db = client.db(DATABASE)
   const book = await db
     .collection('books')
-    .findOne({ _id: book_id })
+    .findOne({ _id: ObjectId(book_id) })
 
+  if (!book) {
+    throw `book ${book_id} not found`
+  }
+  
   let response = {}
   if (book.book_type = 'daily_log') {
     const lenses_name = `lenses.${book_id}`

@@ -24,18 +24,20 @@ async function get_books_metadata (req, res) {
 async function create_new_book(req, res) {
   const book = req.body
 
-  const new_book = { 
-    ...book, 
-    _id: uuid(), 
-    created: Date.now(),
-    edited: Date.now()
-  }
+  const now = Date.now()
+  book.created = now
+  book.edited = now
 
   const client = await clientPromise
   const db = client.db(DATABASE)
-  await db
-    .collection('books')
-    .insertOne(new_book)
 
-  res.status(200).json({ _id: new_book._id })
+  const { insertedId } = await db
+    .collection('books')
+    .insertOne(book)
+  
+  if (!insertedId) {
+    throw `error creating book`
+  }
+
+  res.status(200).json({ _id: insertedId })
 }
