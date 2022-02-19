@@ -10,34 +10,29 @@ export default apiHandler({
 
 async function delete_doc(req, res) {
   const book_id = req.query.book_id
-  const doc = req.body
+  const doc_id = req.query.doc_id
+  const delete_doc = req.query.delete && req.query.delete.toLowerCase() === 'true'
+  if (!delete_doc) {
+    throw 'set delete=true in query string to confirm deletion'
+  }
 
-  // const now = Date.now()
-  // doc.edited = now
+  const client = await clientPromise
+  const db = client.db(DATABASE)
 
-  // const client = await clientPromise
-  // const db = client.db(DATABASE)
+  const delete_res = await db
+    .collection(`docs.${book_id}`)
+    .deleteOne({ _id: ObjectId(doc_id) })
+    
+  const doc_deleted = delete_res.deletedCount > 0
+  if (!doc_deleted) {
+    throw `doc ${doc_id} in book ${book_id} not found`
+  }
 
-  // console.log(doc)
+  const response = {
+    book_id,
+    doc_id,
+    doc_deleted
+  }
 
-  // // console.log(`docs.${book_id}`)
-
-  // const _id = doc._id
-  // console.log(_id)
-  // delete doc._id
-  // const update_res = await db
-  //   .collection(`docs.${book_id}`)
-  //   // .find({})
-  //   // .sort({ edited: -1 })
-  //   // .toArray()
-  //   .updateOne({ _id: ObjectId(_id) }, { $set: doc })
-
-  // let matched = update_res.matchedCount > 0
-  // if (!matched) {
-  //   throw `doc ${book_id} in book ${} not found`
-  // }
-
-  // console.log(update_res)
-
-  res.status(200).json()
+  res.status(200).send(response)
 }

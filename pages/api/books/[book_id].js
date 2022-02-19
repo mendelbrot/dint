@@ -54,7 +54,6 @@ async function delete_book(req, res) {
     throw 'set delete=true in query string to confirm deletion'
   }
 
-
   const client = await clientPromise
   const db = client.db(DATABASE)
 
