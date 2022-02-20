@@ -18,7 +18,7 @@ async function get_books_metadata (req, res) {
     .sort({ edited: -1 })
     .toArray()
 
-  res.status(200).json({books: docs})
+  res.status(200).json(docs)
 }
 
 async function create_new_book(req, res) {
