@@ -1,14 +1,19 @@
-import { useState, useEffect } from 'react'
 import styled from 'styled-components'
-import withData from '/components/withData'
+import withData from '/components/hocs/withData'
+import Link from 'next/link'
+import withLayout from '/components/hocs/withLayout'
+import compose from '/lib/compose'
 
-const Title = styled.h1`
+const ListButton = styled.li`
   font-size: 50px;
   color: green;
+  &:hover {
+    background-color: yellow;
+  }
 `
 
 function Home(props) {
-  const {loading, error, data, getData } = props
+  const { loading, error, data, getData } = props
 
   if (loading) { 
     return (
@@ -26,19 +31,23 @@ function Home(props) {
     )
   }
 
-  if (data) {
-    console.log(data)
-    return (
-      <div>
-        <button onClick={getData}>Refresh</button>
-        <ul>
-          {data.map((item) =>
-            <li key={item._id}>{item.name}</li>
-          )}
-        </ul>
-      </div>
-    )
-  }
+  return (
+    <div>
+      <button onClick={getData}>Refresh</button>
+      <ListButton>
+        {data.map((item) =>
+          <li key={item._id}>
+            <Link href={`/books/${item._id}`}>
+              <a>{item.name}</a>
+            </Link>
+          </li>
+        )}
+      </ListButton>
+    </div>
+  )
 }
 
-export default withData(Home, 'api/books')
+export default compose(
+  withLayout(true),
+  withData('/api/books')
+)(Home)

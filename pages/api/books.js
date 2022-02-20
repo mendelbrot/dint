@@ -1,6 +1,5 @@
 import clientPromise from '/lib/api/mongodb'
 import apiHandler from '/lib/api/apiHandler'
-import { v4 as uuid } from 'uuid'
 
 const DATABASE = 'dint_2'
 
